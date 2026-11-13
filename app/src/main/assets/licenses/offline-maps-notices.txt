@@ -1,0 +1,6 @@
+CCBSport uses Mapsforge 0.25.0 under LGPL v3 with the upstream exception
+for LGPL sections 4(d) and 4(e). The unmodified library source and
+upstream notices are available at https://github.com/mapsforge/mapsforge/tree/0.25.0
+
+The city catalog was derived from Administrative-divisions-of-China:
+https://github.com/modood/Administrative-divisions-of-China
