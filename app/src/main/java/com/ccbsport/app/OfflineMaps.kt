@@ -16,7 +16,10 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import javax.net.ssl.HttpsURLConnection
 
-data class MapCity(val id: String, val name: String, val region: String, val packageId: String, val size: String)
+data class MapCity(
+    val id: String, val name: String, val region: String, val packageId: String, val size: String,
+    val path: String
+)
 data class OfflineMap(val id: String, val label: String, val file: File, val bounds: BoundingBox)
 data class MapTransfer(val label: String, val received: Long = 0, val total: Long = -1)
 
@@ -37,8 +40,9 @@ class OfflineMaps private constructor(private val context: Context) {
     val catalog: List<MapCity> by lazy {
         context.assets.open("map-cities.txt").bufferedReader().useLines { lines ->
             lines.map { line ->
-                val (id, name, region, packageId, size) = line.split('|')
-                MapCity(id, name, region, packageId, size)
+                val fields = line.split('|')
+                val (id, name, region, packageId, size) = fields
+                MapCity(id, name, region, packageId, size, fields.getOrElse(5) { "china/$packageId" })
             }.toList()
         }
     }
@@ -58,7 +62,7 @@ class OfflineMaps private constructor(private val context: Context) {
         preferences.edit().putStringSet("cities", selected.value).apply()
         if (installed.value.any { it.id == city.packageId }) return
         install(city.packageId, city.region, imported = false, R.string.offline_download_failed) { target ->
-            val url = URL("https://download.mapsforge.org/maps/v5/asia/china/${city.packageId}.map")
+            val url = URL("https://download.mapsforge.org/maps/v5/asia/${city.path}.map")
             val connection = url.openConnection() as HttpsURLConnection
             connection.connectTimeout = 12_000
             connection.readTimeout = 15_000
